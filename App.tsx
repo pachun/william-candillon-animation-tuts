@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native"
+import { Dimensions, StyleSheet, Text, View } from "react-native"
 import {
   PanGestureHandler,
   PanGestureHandlerGestureEvent,
@@ -7,7 +7,13 @@ import Animated, {
   useAnimatedGestureHandler,
   useSharedValue,
   useAnimatedStyle,
+  withDecay,
 } from "react-native-reanimated"
+
+const windowWidth = Dimensions.get("window").width
+const windowHeight = Dimensions.get("window").height
+const objectWidth = 300
+const objectHeight = 150
 
 type MyAnimatedContext = {
   currentX: number
@@ -29,6 +35,17 @@ export default function App() {
       translateX.value = context.currentX + event.translationX
       translateY.value = context.currentY + event.translationY
     },
+    onEnd: event => {
+      console.log(`on end`)
+      translateX.value = withDecay({
+        velocity: event.velocityX,
+        clamp: [0, windowWidth - objectWidth],
+      })
+      translateY.value = withDecay({
+        velocity: event.velocityY,
+        clamp: [0, windowHeight - objectHeight],
+      })
+    },
   })
   const style = useAnimatedStyle(() => {
     return {
@@ -43,7 +60,7 @@ export default function App() {
     <View style={styles.container}>
       <PanGestureHandler {...{ onGestureEvent }}>
         <Animated.View {...{ style }}>
-          <View style={styles.square} />
+          <View style={styles.object} />
         </Animated.View>
       </PanGestureHandler>
     </View>
@@ -55,9 +72,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  square: {
-    width: 300,
-    height: 150,
+  object: {
+    width: objectWidth,
+    height: objectHeight,
     backgroundColor: "#bbb",
   },
 })
