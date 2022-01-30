@@ -10,8 +10,8 @@ import Animated, {
 } from "react-native-reanimated"
 
 type MyAnimatedContext = {
-  startX: number
-  startY: number
+  currentX: number
+  currentY: number
 }
 
 export default function App() {
@@ -22,12 +22,12 @@ export default function App() {
     MyAnimatedContext
   >({
     onStart: (event, context) => {
-      context.startX = translateX.value
-      context.startY = translateY.value
+      context.currentX = translateX.value
+      context.currentY = translateY.value
     },
     onActive: (event, context) => {
-      translateX.value = context.startX + event.translationX
-      translateY.value = context.startY + event.translationY
+      translateX.value = context.currentX + event.translationX
+      translateY.value = context.currentY + event.translationY
     },
   })
   const style = useAnimatedStyle(() => {
