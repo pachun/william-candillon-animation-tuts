@@ -9,8 +9,10 @@ import Animated, {
   useAnimatedStyle,
   withDecay,
 } from "react-native-reanimated"
+import { withBouncing } from "./withBouncing"
 
 const clamp = (value: number, lowerBound: number, upperBound: number) => {
+  "worklet"
   return Math.min(Math.max(lowerBound, value), upperBound)
 }
 
@@ -50,14 +52,20 @@ export default function App() {
       )
     },
     onEnd: event => {
-      translateX.value = withDecay({
-        velocity: event.velocityX,
-        clamp: [0, xBoundary],
-      })
-      translateY.value = withDecay({
-        velocity: event.velocityY,
-        clamp: [0, yBoundary],
-      })
+      translateX.value = withBouncing(
+        withDecay({
+          velocity: event.velocityX,
+        }),
+        0,
+        xBoundary,
+      )
+      translateY.value = withBouncing(
+        withDecay({
+          velocity: event.velocityY,
+        }),
+        0,
+        yBoundary,
+      )
     },
   })
   const style = useAnimatedStyle(() => {
