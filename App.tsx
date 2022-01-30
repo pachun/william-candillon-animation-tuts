@@ -10,6 +10,10 @@ import Animated, {
   withDecay,
 } from "react-native-reanimated"
 
+const clamp = (value: number, lowerBound: number, upperBound: number) => {
+  return Math.min(Math.max(lowerBound, value), upperBound)
+}
+
 const windowWidth = Dimensions.get("window").width
 const windowHeight = Dimensions.get("window").height
 const objectWidth = 300
@@ -21,6 +25,8 @@ type MyAnimatedContext = {
 }
 
 export default function App() {
+  const xBoundary = windowWidth - objectWidth
+  const yBoundary = windowHeight - objectHeight
   const translateX = useSharedValue(0)
   const translateY = useSharedValue(0)
   const onGestureEvent = useAnimatedGestureHandler<
@@ -32,18 +38,25 @@ export default function App() {
       context.currentY = translateY.value
     },
     onActive: (event, context) => {
-      translateX.value = context.currentX + event.translationX
-      translateY.value = context.currentY + event.translationY
+      translateX.value = clamp(
+        context.currentX + event.translationX,
+        0,
+        xBoundary,
+      )
+      translateY.value = clamp(
+        context.currentY + event.translationY,
+        0,
+        yBoundary,
+      )
     },
     onEnd: event => {
-      console.log(`on end`)
       translateX.value = withDecay({
         velocity: event.velocityX,
-        clamp: [0, windowWidth - objectWidth],
+        clamp: [0, xBoundary],
       })
       translateY.value = withDecay({
         velocity: event.velocityY,
-        clamp: [0, windowHeight - objectHeight],
+        clamp: [0, yBoundary],
       })
     },
   })
