@@ -1,18 +1,33 @@
 import { StyleSheet, Text, View } from "react-native"
-import { PanGestureHandler } from "react-native-gesture-handler"
+import {
+  PanGestureHandler,
+  PanGestureHandlerGestureEvent,
+} from "react-native-gesture-handler"
 import Animated, {
   useAnimatedGestureHandler,
   useSharedValue,
   useAnimatedStyle,
 } from "react-native-reanimated"
 
+type MyAnimatedContext = {
+  startX: number
+  startY: number
+}
+
 export default function App() {
   const translateX = useSharedValue(0)
   const translateY = useSharedValue(0)
-  const onGestureEvent = useAnimatedGestureHandler({
+  const onGestureEvent = useAnimatedGestureHandler<
+    PanGestureHandlerGestureEvent,
+    MyAnimatedContext
+  >({
+    onStart: (event, context) => {
+      context.startX = translateX.value
+      context.startY = translateY.value
+    },
     onActive: (event, context) => {
-      translateX.value = event.translationX
-      translateY.value = event.translationY
+      translateX.value = context.startX + event.translationX
+      translateY.value = context.startY + event.translationY
     },
   })
   const style = useAnimatedStyle(() => {
@@ -43,6 +58,6 @@ const styles = StyleSheet.create({
   square: {
     width: 300,
     height: 150,
-    backgroundColor: "#666",
+    backgroundColor: "#bbb",
   },
 })
